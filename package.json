@@ -1,0 +1,17 @@
+{
+  "name": "time-clock",
+  "version": "1.0.0",
+  "description": "the automation of DingDing to clock timely.",
+  "main": "src/main.js",
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
+  "keywords": [],
+  "author": "ruaya",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "vuepress": "^1.6.0"
+  }
+}
