@@ -7,8 +7,8 @@ jobs:
     steps:
       - checkout
       - run: echo "start build"
-      - run: sudo npm install yarn -g
-      - run: yarn -v
+      - run: sudo npm install -g npm@10.0.0
+      - run: npm -v
       - run: pwd
       - run: 
           name: echo
