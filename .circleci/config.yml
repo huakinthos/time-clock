@@ -30,7 +30,7 @@ jobs:
       - image: circleci/node:latest
     steps:
       - checkout
-      - run: echo "start deploy"
+      - run: echo "在build之后进行"
 workflows: 
   version: 2.1
   build_and_test1:
@@ -38,4 +38,4 @@ workflows:
       - build
       - deploy
           requires:
-          - build
+            - build
