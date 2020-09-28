@@ -30,7 +30,7 @@ module.exports = {
           'views/guide/install.md'
         ]
       },
-      {
+      /* {
         title: '组件',
         collapsable: true,
         children: [
@@ -38,13 +38,13 @@ module.exports = {
           'views/components/notice/',
           'views/components/practical/',
         ]
-      }
+      } */
     ]
   },
-  scss: {
+  /* scss: {
     sassOptions: {
       indentWidth: 4,
       includePaths: [path.join(__dirname, '../../style')]
     }
-  }
+  } */
 }

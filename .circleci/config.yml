@@ -3,9 +3,19 @@ jobs:
   build:
     docker: 
       - image: circleci/node:latest
+    working_directory: ~/circleci-workflows
     steps:
       - checkout
       - run: echo "start build"
+      - run: sudo npm install yarn -g
+      - run: yarn -v
+      - run: pwd
+      - run: 
+          name: echo
+          command: echo $ruayaToken
+      - run:
+          name: echo2
+          command: echo ${ruayaToken}
   deploy:
     docker: 
       - image: circleci/node:latest

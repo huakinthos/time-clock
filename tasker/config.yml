@@ -63,8 +63,20 @@
 
 # workflows 用于编排所有设定好的job并进行运行
 
+# 点击pipeLine中 工作流的名称 可以进入详细界面, 点击右上角 三个点 可以进入 ProjectSetting 去设置环境变量
 
+# 点击用户头像进入 userSetting, 可以生成个人token, 使得 程序 可以完全读写
 
+# 设置环境变量 export CIRCLE_TOKEN=<你刚刚创建的 token>
+
+# 通过命令行获取circle文件配置
+# #!/usr/bin/env bash
+# curl --user ${CIRCLE_TOKEN}: \
+#    --request POST \
+#    --form revision=<commit hash>\
+#    --form config=@config.yml \
+#    --form notify=false \
+#        https://circleci.com/api/v1.1/project/<source, eg. github>/<user name>/<project name>/tree/<branch name>
 
 
 
@@ -75,7 +87,7 @@ jobs:
   build:
     docker:
       - image: circleci/node:latest
-    working_directory: ~/circleci-demo-workflows
+    working_directory: ~/circleci-workflows
     steps: 
       - checkout
       - run: sudo npm install -g npm@10.0.0
