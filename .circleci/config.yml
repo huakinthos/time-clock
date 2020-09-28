@@ -9,16 +9,22 @@ jobs:
           fingerprints:
             - "56:cf:a5:58:e5:34:69:bb:c0:1f:bc:a6:e5:e6:64:0b"
       - checkout
+      - run: yarn install
+      - restore_cache:
+          keys: 
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies
+      - save_cache:
+          key: v1-dependencies-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+      - run: yarn docs:build
       - run: echo "start build"
-      - run: sudo npm install -g yarn
-      - run: yarn -v
-      - run: pwd
-      - run: 
-          name: echo
-          command: echo $ruayaToken
-      - run:
-          name: echo2
-          command: echo ${ruayaToken}
+      - deploy:
+          name: deploy
+          command: |
+            echo ${CIRCLE_BRANCH}
+      - run: echo '部署完毕'
   deploy:
     docker: 
       - image: circleci/node:latest
@@ -31,3 +37,5 @@ workflows:
     jobs:
       - build
       - deploy
+          requires:
+          - build
