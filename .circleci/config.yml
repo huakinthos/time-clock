@@ -1,4 +1,4 @@
-version: 2.0
+version: 2.1
 jobs:
   build:
     docker: 
@@ -13,7 +13,7 @@ jobs:
       - checkout
       - run: echo "start deploy"
 workflows: 
-  version: 2.0
+  version: 2.1
   build_and_test1:
     jobs:
       - build
