@@ -104,7 +104,7 @@ jobs:
             - v1-dependencies
       - add_ssh_keys:
           fingerprints:
-            - "bd:dd:23:90:d7:86:80:d8:92:31:1b:41:09:09:27:87"
+            - "https://circleci.com/gh/ruaya/time-clock/edit#ssh 界面中的userkey 的 md5值"
       - run: echo $REMOTE_HOSTKEY >> ~/.ssh/known_hosts
       - deploy:
           name: deploy

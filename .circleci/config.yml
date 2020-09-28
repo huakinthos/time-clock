@@ -5,10 +5,13 @@ jobs:
       - image: circleci/node:latest
     working_directory: ~/circleci-workflows
     steps:
+       - add_ssh_keys:
+          fingerprints:
+            - "56:cf:a5:58:e5:34:69:bb:c0:1f:bc:a6:e5:e6:64:0b"
       - checkout
       - run: echo "start build"
-      - run: sudo npm install -g npm@10.0.0
-      - run: npm -v
+      - run: sudo npm install -g yarn
+      - run: yarn -v
       - run: pwd
       - run: 
           name: echo
