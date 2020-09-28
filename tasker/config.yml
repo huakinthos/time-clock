@@ -1,0 +1,115 @@
+# push to github => 在一个干净的容器/虚拟机中测试和构建，并返回结果 => 自动部署到各种环境 
+# 有两个job叫 build和test
+
+# job下的键
+# docker键 来指定当前job使用的docker，image是指docker所使用的镜像。可以指定多个镜像。第一个列出的是主容器，所有的step都会在主容器中进行.
+# working_directory 属性是用来定义steps 在哪个目录运行
+# steps 当前 job 要运行的 命令 (command) 列表
+
+# steps 将负责对环境的初始化，与项目的 构建测试 和 部署: 
+# ## 构建测试
+# 1. 检出代码
+# - checkout   将github分支中的代码检出到 working_directory
+# - setup_remote_docker  让步骤中可以调用其他 docker
+# 2. 从缓存中恢复 package中的 依赖目录
+# - restore_cache: 
+#     keys: 
+#       - v1-dependencies-{{ checksum "package.json" }}
+#       # 如果没有匹配的缓存则使用最新的缓存
+#       - v1-dependencies
+# 3. 安装依赖
+# - run
+# 4. 缓存依赖
+# - save_cache
+#     key 为依赖目录
+#     path 为缓存的目录
+# 5. 测试 使用run在项目目录下执行命令
+# - run
+#     name:
+#     command:
+# 6. 打包docker镜像, 将镜像命名为$FULL_IMAGE_NAME, 并将镜像保存为tar文件
+# - run
+#     name: build docker image
+#     command: |
+#       docker build -t $FULL_IMAGE_NAME .
+#       mkdir docker-image
+#       docker save -o docker-image/image.tar $FULL_IMAGE_NAME
+# 7. 运行并测试镜像
+# - run:
+#     name: Test image
+#     command: |
+#       docker run -d -p 8080:80 --name built-image $FULL_IMAGE_NAME
+#       sleep 10
+#       docker run --network container:built-image byrnedo/alpine-curl -I --retry 10 --retry-connrefused http://localhost
+# 8. 保存镜像到临时文件 保存刚才镜像 tar 归档文件到 workspace，以便 build job 使用
+# - persist_to_workspace:
+#     root: .
+#     paths:
+#     - docker-image
+#
+# ## 部署
+# 1. 检出代码
+# 2. 加载构建好的docker镜像
+# - attach_workspace:
+#     at: workspace
+# - run:
+#     name: Load image
+#     command: |
+#       docker load --input workspace/docker-image/image.tar
+# 挂载 workspace 到当前 job, 挂载后 当前 job 的 workspace/docker-image/image.tar 为上一步打包出的 docker 镜像  
+# 使用 docker load 导入镜像
+# 3. 安装 部署cli
+# 4. 推送镜像到 部署环境， 需要设置环境变量
+
+# workflows 用于编排所有设定好的job并进行运行
+
+
+
+
+
+
+
+version: 2.0
+jobs:
+  # 设定工作名称 为build
+  build:
+    docker:
+      - image: circleci/node:latest
+    working_directory: ~/circleci-demo-workflows
+    steps: 
+      - checkout
+      - run: sudo npm install -g npm@10.0.0
+      - run: npm install 
+      - save_cache:
+          key: v1-dependencies-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+      - run: npm run docs:build
+      - run: echo '部署开始'
+      - restore_cache:
+          keys: 
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies
+      - add_ssh_keys:
+          fingerprints:
+            - "bd:dd:23:90:d7:86:80:d8:92:31:1b:41:09:09:27:87"
+      - run: echo $REMOTE_HOSTKEY >> ~/.ssh/known_hosts
+      - deploy:
+          name: deploy
+          command: |
+            if [ "${CIRCLE_BRANCH}" = "master" ]; then
+              rsync -avce ssh build $SSH_USER@$SSH_IP:/data/corki-ui-web/
+            else
+              echo "Not master branch, dry run only"
+            fi
+      - run: echo '部署完毕'
+  test:
+    docker:
+      - image: circleci/node:latest
+workflows:
+  version: 2
+  # 设定工作流名称 为build_and_test, jobs 为 设置的job工作名称。
+  build_and_test1:
+    jobs:
+      - build
+      - test
