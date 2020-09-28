@@ -1,0 +1,20 @@
+version: 2.0
+jobs:
+  build:
+    docker: 
+      - image: circleci/node:latest
+    steps:
+      - checkout
+      - run: echo "start build"
+  deploy:
+    docker: 
+      - image: circleci/node:latest
+    steps:
+      - checkout
+      - run: echo "start deploy"
+workflows: 
+  version: 2.0
+  build_and_test1:
+    jobs:
+      - build
+      - deploy
