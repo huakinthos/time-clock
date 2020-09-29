@@ -13,8 +13,8 @@ const BUNDLE_ID_DD = "com.alibaba.android.rimet"
 const BUNDLE_ID_XMSF = "com.xiaomi.xmsf"
 const BUNDLE_ID_MAIL = "com.netease.mail"
 
-const NAME_OF_EMAILL_APP = "网易邮箱大师"
-const NAME_OF_ATTENDANCE_MACHINE = "前台大门" // 考勤机名称
+const NAME_OF_EMAILL_APP = "qq邮箱"
+const NAME_OF_ATTENDANCE_MACHINE = "健康打卡" // 活动打卡名称
 
 const LOWER_BOUND = 1 * 60 * 1000       // 最小随机等待时间：1min
 const UPPER_BOUND = 5 * 60 * 1000       // 最大随机等待时间：5min
@@ -135,56 +135,14 @@ function doClock() {
     enterGongzuo()      // 进入工作台
     enterKaoqin()       // 进入打卡界面
 
-    if (currentDate.getHours() <= 12) {
-        clockIn()       // 上班打卡
+    if (currentDate.getHours() <= 12 || currentDate.getDate() <= 4) {
+        clockIn()       // 早上和晚上打卡
     }
     else {
-        clockOut()      // 下班打卡
+        clockOut()      // 中午打卡
     }
     lockScreen()        // 关闭屏幕
     console.hide()      // 关闭控制台
-}
-
-
-/**
- * @description 发邮件主程序
- * @param {type} 
- * @return {type} 
- */
-function sendEmail() {
-
-    console.info("开始执行邮件发送主程序")
-
-    brightScreen()      // 唤醒屏幕
-    unlockScreen()      // 解锁屏幕
-
-    console.info("正在发送邮件")
-    app.sendEmail({
-        email: [EMAILL_ADDRESS],
-        subject: "考勤结果",
-        text: message
-    })
-    
-    waitForActivity("com.android.internal.app.ChooserActivity")
-    if (null != textMatches(NAME_OF_EMAILL_APP).findOne(3000)) {
-        btn_email = textMatches(NAME_OF_EMAILL_APP).findOnce().parent()
-        btn_email.click()
-    }
-    else {
-        console.log("没有找到" + NAME_OF_EMAILL_APP)
-        lockScreen()
-        return;
-    }
-
-    waitForActivity("com.netease.mobimail.activity.MailComposeActivity")
-    id("send").findOne().click()
-
-    console.log("已发送")
-    message = ""
-    
-    home()
-    sleep(1000)
-    lockScreen() // 关闭屏幕
 }
 
 
@@ -243,7 +201,6 @@ function stopApp() {
 
     console.info("结束钉钉进程")
     
-    // shell('am force-stop ' + BUNDLE_ID_DD, true) // 已获取Root权限的用这一句
     app.openAppSetting(BUNDLE_ID_DD)
     let btn_finish = textMatches(/(.*结束.*)|(.*停止.*)|(.*运行.*)/).clickable(true).findOne() // 找到 "结束运行" 按钮，并点击
     if (btn_finish.enabled()) {
@@ -362,17 +319,17 @@ function handleLate(){
  */
 function enterGongzuo(){
     
-    if (null != descMatches("工作台").clickable(true).findOne(3000)) {
-        toastLog("descMatches：工作台")
-        btn_gongzou = descMatches(/(.*工作台.*)/).findOnce()
+    if (null != descMatches("城院钉").clickable(true).findOne(3000)) {
+        toastLog("descMatches：城院钉")
+        btn_gongzou = descMatches(/(.*工城院.*)/).findOnce()
         btn_gongzou.click()
     }
 
-    console.info("正在进入工作台...")
+    console.info("正在进入城院钉...")
     sleep(5000)
     
     if (id("menu_work_info").exists()) {
-        console.log("已进入工作台页面")
+        console.log("已进入城院钉页面")
         sleep(1000)
     }
 }
@@ -384,27 +341,27 @@ function enterGongzuo(){
  * @return {type} 
  */
 function enterKaoqin(){
-    if (null != textMatches("去打卡").clickable(true).findOne(3000)) {
-        console.log("textMatches：去打卡")
-        btn_kaoqin = textMatches(/(.*去打卡.*)/).clickable(true).findOnce() 
+    if (null != textMatches("健康打卡").clickable(true).findOne(3000)) {
+        console.log("textMatches：健康打卡")
+        btn_kaoqin = textMatches(/(.*健康打卡.*)/).clickable(true).findOnce() 
         btn_kaoqin.click()
     }
     else {
         attendKaoqin()
     }
 
-    console.info("正在进入考勤打卡页面...")
+    console.info("正在进入健康打卡页面...")
     sleep(6000)
     
     if (null != textMatches("申请").clickable(true).findOne(3000)) {
-        console.log("已进入考勤打卡页面")
+        console.log("已进入健康打卡页面")
         sleep(1000)
     }
 }
 
 // !
 /**
- * @description 直接拉起考勤打卡界面（URL Scheme）
+ * @description 直接拉起打卡界面（URL Scheme）
  * @param {type} 
  * @return {type} 
  */
@@ -419,7 +376,7 @@ function attendKaoqin(){
 
 // !
 /**
- * @description 上班打卡 
+ * @description 早上晚上打卡 
  * @param {type} 
  * @return {type} 
  */
@@ -434,7 +391,7 @@ function clockIn() {
         return;
     }
 
-    console.log("等待连接到考勤机...")
+    console.log("等待连接到打卡...")
     textContains(NAME_OF_ATTENDANCE_MACHINE).waitFor()
     
     console.log("已连接")
@@ -447,8 +404,6 @@ function clockIn() {
     click(BUTTON_DAKA_X,BUTTON_DAKA_Y)
     console.log("按下打卡按钮")
     sleep(1000)
-
-    handleLate() // 迟到打卡
     
     if (null != textMatches("我知道了").clickable(true).findOne(1000)) {
         text("我知道了").findOne().click()
@@ -456,8 +411,8 @@ function clockIn() {
 
     sleep(2000);
     
-    if (null != textContains("上班打卡成功").findOne(3000)) {
-        toastLog("上班打卡成功")
+    if (null != textContains("打卡成功").findOne(3000)) {
+        toastLog("打卡成功")
     }
 
     home()
@@ -466,52 +421,42 @@ function clockIn() {
 
 // !
 /**
- * @description 下班打卡 
+ * @description 中午打卡, // !多选项 
  * @param {type} 
  * @return {type} 
  */
 function clockOut() {
 
-    console.info("下班打卡...")
+    console.info("中午打卡...")
 
-    if (null != textContains("更新打卡").findOne(1000)) {
+    // 进入打卡记录, 查看是否打卡
+    if (null != textContains("返校生中午打卡").findOne(1000)) {
         toastLog("已打卡")
-        if (null != textContains("早退").findOne(1000)) {
-            toastLog("早退")
-        }
-        else {
-            home()
-            sleep(1000)
-            return;
-        }
-        console.log("更新打卡记录")
+        home()
+        sleep(1000)
+        return;
     }
 
-    console.log("等待连接到考勤机...")
+    console.log("等待连接到打卡服务器...")
     textContains(NAME_OF_ATTENDANCE_MACHINE).waitFor()
     
     console.log("已连接")
     sleep(1000)
 
-    if (null != textMatches("下班打卡").clickable(true).findOne(1000)) {
-        textMatches(/(.*下班打卡.*)/).findOnce().click()
+    if (null != textMatches("中午打卡").clickable(true).findOne(1000)) {
+        textMatches(/(.*中午打卡.*)/).findOnce().click()
         console.log("按下打卡按钮")
         sleep(1000)
     }
 
-    if (null != textContains("早退打卡").clickable(true).findOne(1000)) {
-        className("android.widget.Button").text("早退打卡").findOnce().parent().click()
-        console.log("早退打卡")
-    }
-    
     if (null != textMatches("我知道了").clickable(true).findOne(1000)) {
         text("我知道了").findOne().click()
     }
 
     sleep(2000);
     
-    if (null != textContains("下班打卡成功").findOne(3000)) {
-        toastLog("下班打卡成功")
+    if (null != textContains("打卡成功").findOne(3000)) {
+        toastLog("中午打卡成功")
     }
 
     home()
@@ -532,5 +477,5 @@ function lockScreen(){
     device.cancelKeepingAwake() // 取消设备常亮
     
     // Power() // 模拟按下电源键，此函数依赖于root权限
-    press(BUTTON_HOME_POS_X, BUTTON_HOME_POS_Y, 1000) // 小米的快捷手势：长按Home键锁屏
+    press(BUTTON_HOME_POS_X, BUTTON_HOME_POS_Y, 1000) // 一加的快捷手势：锁屏
 }
