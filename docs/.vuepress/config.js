@@ -12,7 +12,7 @@ module.exports = {
   themeConfig: {
     nav: [
       { text: 'home', link: '/' },
-      { text: 'github', link: 'https://github.com/ruaya/ruaya.github.io' }
+      { text: 'github', link: 'https://github.com/ruaya/time-clock' }
     ],
     /**
      * 一级菜单 sidebar中的 { title }

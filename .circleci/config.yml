@@ -19,29 +19,29 @@ jobs:
           paths:
             - node_modules
       - run: yarn docs:build
-      - run: echo "start build in docs/.vuepress/dist"
+      - run: echo "start build static"
     
       - run:
           name: build image by Dockerfile
           command: |
-              docker build ./ -t ruaya/time-clock:Build-${CIRCLE_BUILD_NUM}-CI
+              docker build ./ -t ruaya/time-clock:1.0.0
       - run:
           name: login to docker hub
           command: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run:
           name: push to docker hub
           command: |
-              docker tag ruaya/time-clock:Build-${CIRCLE_BUILD_NUM}-CI ruaya/time-clock:latest
+              docker tag ruaya/time-clock:1.0.0 ruaya/time-clock:latest
               docker push ruaya/time-clock:latest
   deploy:
     docker: 
-      - image: circleci/node:latest
+      - image: circleci/nginx:latest
     steps:
       - checkout
-      - run: echo "在build之后进行"
+      - run: echo "deploy image to dockerhub"
 workflows: 
   version: 2.1
-  build_and_test1:
+  build_and_deploy:
     jobs:
       - build
       - deploy:
