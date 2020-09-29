@@ -5,39 +5,20 @@ jobs:
       - image: circleci/node:latest
     working_directory: ~/circleci-workflows
     steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "f8:80:2c:28:27:9e:63:6d:05:e3:f8:cf:25:53:5e:26"
       - checkout
       - restore_cache:
           keys: 
-            - v1-dependencies-{{ checksum "package.json" }}
             - v1-dependencies
       - run: yarn install
       - save_cache:
-          key: v1-dependencies-{{ checksum "package.json" }}
+          key: v1-dependencies
           paths:
             - node_modules
       - run: yarn docs:build
       - run: echo "start build static"
-    
-      # - run:
-      #     name: build image by Dockerfile
-      #     command: |
-      #         docker build ./ -t ruaya/time-clock:1.0.0
-      # - run:
-      #     name: login to docker hub
-      #     command: docker login -u $DOCKER_USER -p $DOCKER_PASS
-      # - run:
-      #     name: push to docker hub
-      #     command: |
-      #         docker tag ruaya/time-clock:1.0.0 ruaya/time-clock:latest
-      #         docker push ruaya/time-clock:latest
-  deploy:
-    docker: 
-      - image: circleci/nginx
-    steps:
-      - run: echo "deploy image to dockerhub"
+
+      - setup_remote_docker
+      
       - run:
           name: build image by Dockerfile
           command: |
@@ -50,11 +31,3 @@ jobs:
           command: |
               docker tag ruaya/time-clock:1.0.0 ruaya/time-clock:latest
               docker push ruaya/time-clock:latest
-workflows: 
-  version: 2.1
-  build_and_deploy:
-    jobs:
-      - build
-      - deploy:
-          requires:
-            - build
