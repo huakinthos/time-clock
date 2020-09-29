@@ -19,10 +19,10 @@ jobs:
           paths:
             - node_modules
       - run: yarn docs:build
-      - run: echo "start build in docs/.vuepress/dist"
+      - run: echo "start build"
     
       - run:
-          name: build image by Dockerfile
+          name: build image
           command: |
               docker build ./ -t ruaya/time-clock:Build-${CIRCLE_BUILD_NUM}-CI
       - run:
