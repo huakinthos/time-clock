@@ -35,9 +35,8 @@ jobs:
       #         docker push ruaya/time-clock:latest
   deploy:
     docker: 
-      - image: circleci/nginx:latest
+      - image: circleci/nginx
     steps:
-      - checkout
       - run: echo "deploy image to dockerhub"
       - run:
           name: build image by Dockerfile
