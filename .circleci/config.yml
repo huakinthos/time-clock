@@ -7,7 +7,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "56:cf:a5:58:e5:34:69:bb:c0:1f:bc:a6:e5:e6:64:0b"
+            - "f8:80:2c:28:27:9e:63:6d:05:e3:f8:cf:25:53:5e:26"
       - checkout
       - run: yarn install
       - restore_cache:
