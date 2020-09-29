@@ -10,8 +10,8 @@ const PASSWORD = "钉钉密码"
 const EMAILL_ADDRESS = "用于接收打卡结果的邮箱地址"
 
 const BUNDLE_ID_DD = "com.alibaba.android.rimet"
-const BUNDLE_ID_XMSF = "com.xiaomi.xmsf"
-const BUNDLE_ID_MAIL = "com.netease.mail"
+const BUNDLE_ID_XMSF = "com.oneplus.xmsf"
+const BUNDLE_ID_MAIL = "net.oneplus.launcher"
 
 const NAME_OF_EMAILL_APP = "qq邮箱"
 const NAME_OF_ATTENDANCE_MACHINE = "健康打卡" // 活动打卡名称
